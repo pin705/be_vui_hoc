@@ -5,6 +5,8 @@ import GamesHomePage from "pages/games";
 import ShapesGame from "pages/games/shapes";
 import LettersGame from "pages/games/letters";
 import CountingGame from "pages/games/counting";
+import PuzzleGame from "pages/games/puzzle";
+import MemoryGame from "pages/games/memory";
 import { getSystemInfo } from "zmp-sdk";
 import { ScrollRestoration } from "./scroll-restoration";
 
@@ -30,6 +32,8 @@ export const Layout: FC = () => {
           <Route path="/game/shapes" element={<ShapesGame />}></Route>
           <Route path="/game/letters" element={<LettersGame />}></Route>
           <Route path="/game/counting" element={<CountingGame />}></Route>
+          <Route path="/game/puzzle" element={<PuzzleGame />}></Route>
+          <Route path="/game/memory" element={<MemoryGame />}></Route>
         </Routes>
       </Box>
     </Box>

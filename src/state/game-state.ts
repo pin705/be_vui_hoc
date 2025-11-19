@@ -28,6 +28,22 @@ export const gamesState = atom<Game[]>({
       color: "#98FB98",
       route: "/game/counting",
     },
+    {
+      id: "puzzle",
+      title: "Ghép Hình",
+      description: "Sắp xếp các mảnh ghép đúng vị trí",
+      icon: "🧩",
+      color: "#FFE4B5",
+      route: "/game/puzzle",
+    },
+    {
+      id: "memory",
+      title: "Trí Nhớ Siêu Phàm",
+      description: "Tìm các cặp hình giống nhau",
+      icon: "🧠",
+      color: "#E6E6FA",
+      route: "/game/memory",
+    },
   ],
 });
 

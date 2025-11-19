@@ -3,6 +3,7 @@ import { Box, Page, Text, Button } from "zmp-ui";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { shapesDataState, gameScoresState } from "state/game-state";
+import { soundManager } from "utils/sound";
 
 interface DropZone {
   id: string;
@@ -81,17 +82,21 @@ const ShapesGame: React.FC = () => {
   const [gameComplete, setGameComplete] = useState(false);
 
   const handleDragStart = (shapeType: string) => {
+    soundManager.playTap();
     setDraggedShape(shapeType);
   };
 
   const handleDrop = (zoneId: string, zoneShape: string) => {
     if (draggedShape === zoneShape) {
+      soundManager.playSuccess();
       setDropZones((prev) =>
         prev.map((zone) =>
           zone.id === zoneId ? { ...zone, filled: true } : zone
         )
       );
       setScore((prev) => prev + 1);
+    } else {
+      soundManager.playError();
     }
     setDraggedShape(null);
   };
@@ -99,6 +104,7 @@ const ShapesGame: React.FC = () => {
   useEffect(() => {
     if (dropZones.every((zone) => zone.filled)) {
       setGameComplete(true);
+      soundManager.playCelebration();
       const stars = score === 4 ? 3 : score === 3 ? 2 : 1;
       setGameScores((prev) => [
         ...prev.filter((s) => s.gameId !== "shapes"),
@@ -125,27 +131,44 @@ const ShapesGame: React.FC = () => {
   };
 
   return (
-    <Page className="bg-gradient-to-b from-pink-100 to-pink-50">
+    <Page 
+      className="relative overflow-hidden"
+      style={{
+        background: "linear-gradient(to bottom, #fce4ec, #f8bbd0, #f48fb1)",
+      }}
+    >
       <Box className="p-4">
         {/* Header */}
         <Box className="flex justify-between items-center mb-6">
           <Button
             size="small"
             onClick={() => navigate("/")}
-            className="bg-white"
+            className="shadow-lg"
+            style={{
+              background: "rgba(255, 255, 255, 0.9)",
+              borderRadius: "12px",
+            }}
           >
             ← Quay lại
           </Button>
-          <Text className="text-xl font-bold text-pink-600">
-            Điểm: {score}/4
-          </Text>
+          <Box 
+            className="px-4 py-2 rounded-full"
+            style={{
+              background: "rgba(255, 255, 255, 0.9)",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <Text className="text-xl font-bold text-pink-600">
+              Điểm: {score}/4
+            </Text>
+          </Box>
         </Box>
 
         <Box className="text-center mb-8">
-          <Text className="text-2xl font-bold text-gray-800">
+          <Text className="text-3xl font-bold text-pink-900 mb-2">
             🔷 Nhận Biết Hình Dạng 🔷
           </Text>
-          <Text className="text-gray-600 mt-2">
+          <Text className="text-gray-700 font-medium">
             Kéo hình dạng vào ô đúng!
           </Text>
         </Box>
@@ -154,14 +177,25 @@ const ShapesGame: React.FC = () => {
           <>
             {/* Drop Zones */}
             <Box className="mb-8">
-              <Text className="text-lg font-semibold mb-4 text-center">
+              <Text className="text-lg font-semibold mb-4 text-center text-pink-900">
                 Thả hình vào đây:
               </Text>
               <Box className="grid grid-cols-2 gap-4">
                 {dropZones.map((zone) => (
                   <Box
                     key={zone.id}
-                    className="bg-white rounded-xl p-6 border-4 border-dashed border-gray-300 flex items-center justify-center min-h-[120px]"
+                    className="rounded-2xl p-6 flex items-center justify-center min-h-[120px] transition-all duration-300"
+                    style={{
+                      background: zone.filled 
+                        ? "linear-gradient(135deg, #a5d6a7 0%, #66bb6a 100%)"
+                        : "rgba(255, 255, 255, 0.8)",
+                      border: zone.filled 
+                        ? "3px solid #4caf50" 
+                        : "3px dashed rgba(0, 0, 0, 0.2)",
+                      boxShadow: zone.filled 
+                        ? "0 8px 24px rgba(76, 175, 80, 0.3)" 
+                        : "0 4px 12px rgba(0, 0, 0, 0.1)",
+                    }}
                     onClick={() => draggedShape && handleDrop(zone.id, zone.shape)}
                   >
                     {zone.filled ? (
@@ -176,17 +210,26 @@ const ShapesGame: React.FC = () => {
 
             {/* Draggable Shapes */}
             <Box>
-              <Text className="text-lg font-semibold mb-4 text-center">
+              <Text className="text-lg font-semibold mb-4 text-center text-pink-900">
                 Chọn hình:
               </Text>
               <Box className="grid grid-cols-4 gap-3">
                 {shapesData.map((item) => (
                   <Box
                     key={item.id}
-                    className="bg-white rounded-lg p-4 shadow-md cursor-pointer active:scale-95 transition-transform flex items-center justify-center"
+                    className="rounded-xl p-4 cursor-pointer transition-all duration-200 flex items-center justify-center"
                     onClick={() => handleDragStart(item.shape)}
                     style={{
-                      border: draggedShape === item.shape ? "3px solid #FF6B9D" : "none",
+                      background: draggedShape === item.shape 
+                        ? "linear-gradient(135deg, #FF6B9D 0%, #FF8E9E 100%)"
+                        : "rgba(255, 255, 255, 0.9)",
+                      border: draggedShape === item.shape 
+                        ? "3px solid #FF1744" 
+                        : "2px solid rgba(0, 0, 0, 0.1)",
+                      boxShadow: draggedShape === item.shape
+                        ? "0 6px 20px rgba(255, 23, 68, 0.3)"
+                        : "0 4px 12px rgba(0, 0, 0, 0.1)",
+                      transform: draggedShape === item.shape ? "scale(0.95)" : "scale(1)",
                     }}
                   >
                     <ShapeRenderer shape={item.shape} size={50} />
@@ -196,8 +239,13 @@ const ShapesGame: React.FC = () => {
             </Box>
           </>
         ) : (
-          <Box className="text-center mt-12">
-            <Text className="text-6xl mb-4">🎉</Text>
+          <Box className="text-center mt-12 rounded-3xl p-8 max-w-md mx-auto"
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              boxShadow: "0 12px 40px rgba(0, 0, 0, 0.15)",
+            }}
+          >
+            <Text className="text-6xl mb-4 animate-bounce">🎉</Text>
             <Text className="text-3xl font-bold text-green-600 mb-4">
               Tuyệt vời!
             </Text>
@@ -205,10 +253,24 @@ const ShapesGame: React.FC = () => {
               Bạn đã hoàn thành trò chơi!
             </Text>
             <Box className="flex gap-4 justify-center">
-              <Button onClick={resetGame} className="bg-pink-500">
+              <Button 
+                onClick={resetGame}
+                style={{
+                  background: "linear-gradient(135deg, #f48fb1 0%, #f06292 100%)",
+                  color: "white",
+                  boxShadow: "0 4px 12px rgba(244, 143, 177, 0.4)",
+                }}
+              >
                 Chơi lại
               </Button>
-              <Button onClick={() => navigate("/")} className="bg-purple-500">
+              <Button 
+                onClick={() => navigate("/")}
+                style={{
+                  background: "linear-gradient(135deg, #9575cd 0%, #7e57c2 100%)",
+                  color: "white",
+                  boxShadow: "0 4px 12px rgba(149, 117, 205, 0.4)",
+                }}
+              >
                 Về trang chủ
               </Button>
             </Box>

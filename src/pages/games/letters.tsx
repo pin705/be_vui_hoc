@@ -3,6 +3,7 @@ import { Box, Page, Text, Button } from "zmp-ui";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { lettersDataState, gameScoresState } from "state/game-state";
+import { soundManager } from "utils/sound";
 
 const LettersGame: React.FC = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const LettersGame: React.FC = () => {
     const currentLetter = lettersData[currentLetterIndex];
     
     if (letter === currentLetter.letter) {
+      soundManager.playSuccess();
       setShowFeedback('correct');
       setScore((prev) => prev + 1);
       
@@ -45,6 +47,7 @@ const LettersGame: React.FC = () => {
         if (currentLetterIndex < lettersData.length - 1) {
           setCurrentLetterIndex((prev) => prev + 1);
         } else {
+          soundManager.playCelebration();
           setGameComplete(true);
           const stars = score + 1 >= 7 ? 3 : score + 1 >= 5 ? 2 : 1;
           setGameScores((prev) => [
@@ -60,6 +63,7 @@ const LettersGame: React.FC = () => {
         }
       }, 1000);
     } else {
+      soundManager.playError();
       setShowFeedback('wrong');
       setTimeout(() => {
         setShowFeedback(null);
@@ -77,27 +81,44 @@ const LettersGame: React.FC = () => {
   const currentLetter = lettersData[currentLetterIndex];
 
   return (
-    <Page className="bg-gradient-to-b from-blue-100 to-blue-50">
+    <Page 
+      className="relative overflow-hidden"
+      style={{
+        background: "linear-gradient(to bottom, #e3f2fd, #bbdefb, #90caf9)",
+      }}
+    >
       <Box className="p-4">
         {/* Header */}
         <Box className="flex justify-between items-center mb-6">
           <Button
             size="small"
             onClick={() => navigate("/")}
-            className="bg-white"
+            className="shadow-lg"
+            style={{
+              background: "rgba(255, 255, 255, 0.9)",
+              borderRadius: "12px",
+            }}
           >
             ← Quay lại
           </Button>
-          <Text className="text-xl font-bold text-blue-600">
-            Điểm: {score}/{lettersData.length}
-          </Text>
+          <Box 
+            className="px-4 py-2 rounded-full"
+            style={{
+              background: "rgba(255, 255, 255, 0.9)",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <Text className="text-xl font-bold text-blue-600">
+              Điểm: {score}/{lettersData.length}
+            </Text>
+          </Box>
         </Box>
 
         <Box className="text-center mb-8">
-          <Text className="text-2xl font-bold text-gray-800">
+          <Text className="text-3xl font-bold text-blue-900 mb-2">
             🔤 Truy Tìm Chữ Cái 🔤
           </Text>
-          <Text className="text-gray-600 mt-2">
+          <Text className="text-gray-700 font-medium">
             Tìm chữ cái được hiển thị!
           </Text>
         </Box>
@@ -105,8 +126,14 @@ const LettersGame: React.FC = () => {
         {!gameComplete ? (
           <>
             {/* Current Letter Display */}
-            <Box className="bg-white rounded-2xl p-8 mb-8 text-center shadow-lg">
-              <Text className="text-sm text-gray-500 mb-4">
+            <Box 
+              className="rounded-3xl p-8 mb-8 text-center"
+              style={{
+                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)",
+                boxShadow: "0 12px 32px rgba(33, 150, 243, 0.2)",
+              }}
+            >
+              <Text className="text-sm text-gray-500 mb-4 font-medium">
                 Tìm chữ cái:
               </Text>
               <Text
@@ -114,6 +141,7 @@ const LettersGame: React.FC = () => {
                 style={{
                   fontSize: "120px",
                   color: "#2196F3",
+                  textShadow: "0 4px 8px rgba(33, 150, 243, 0.3)",
                 }}
               >
                 {currentLetter?.letter}
@@ -125,15 +153,21 @@ const LettersGame: React.FC = () => {
               {shuffledLetters.map((letter) => (
                 <Box
                   key={letter}
-                  className="bg-white rounded-xl p-8 shadow-md cursor-pointer active:scale-95 transition-transform text-center"
+                  className="rounded-2xl p-8 cursor-pointer transition-all duration-200 text-center"
                   onClick={() => !showFeedback && handleLetterClick(letter)}
                   style={{
-                    backgroundColor:
+                    background:
                       showFeedback === 'correct' && letter === currentLetter.letter
-                        ? "#4CAF50"
+                        ? "linear-gradient(135deg, #a5d6a7 0%, #66bb6a 100%)"
                         : showFeedback === 'wrong' && letter !== currentLetter.letter
-                        ? "#F44336"
-                        : "white",
+                        ? "linear-gradient(135deg, #ef9a9a 0%, #e57373 100%)"
+                        : "rgba(255, 255, 255, 0.9)",
+                    boxShadow:
+                      showFeedback === 'correct' && letter === currentLetter.letter
+                        ? "0 8px 24px rgba(76, 175, 80, 0.4)"
+                        : showFeedback === 'wrong' && letter !== currentLetter.letter
+                        ? "0 8px 24px rgba(244, 67, 54, 0.4)"
+                        : "0 6px 20px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   <Text
@@ -162,8 +196,14 @@ const LettersGame: React.FC = () => {
             )}
           </>
         ) : (
-          <Box className="text-center mt-12">
-            <Text className="text-6xl mb-4">🏆</Text>
+          <Box 
+            className="text-center mt-12 rounded-3xl p-8 max-w-md mx-auto"
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              boxShadow: "0 12px 40px rgba(0, 0, 0, 0.15)",
+            }}
+          >
+            <Text className="text-6xl mb-4 animate-bounce">🏆</Text>
             <Text className="text-3xl font-bold text-green-600 mb-4">
               Xuất sắc!
             </Text>
@@ -171,10 +211,24 @@ const LettersGame: React.FC = () => {
               Bạn đã tìm đúng {score} chữ cái!
             </Text>
             <Box className="flex gap-4 justify-center">
-              <Button onClick={resetGame} className="bg-blue-500">
+              <Button 
+                onClick={resetGame}
+                style={{
+                  background: "linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%)",
+                  color: "white",
+                  boxShadow: "0 4px 12px rgba(100, 181, 246, 0.4)",
+                }}
+              >
                 Chơi lại
               </Button>
-              <Button onClick={() => navigate("/")} className="bg-purple-500">
+              <Button 
+                onClick={() => navigate("/")}
+                style={{
+                  background: "linear-gradient(135deg, #9575cd 0%, #7e57c2 100%)",
+                  color: "white",
+                  boxShadow: "0 4px 12px rgba(149, 117, 205, 0.4)",
+                }}
+              >
                 Về trang chủ
               </Button>
             </Box>
