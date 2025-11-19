@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "ZaUI Coffee",
+    "title": "Bé Vui Học",
     "textColor": "black",
     "leftButton": "none",
     "statusBar": "transparent",
@@ -9,12 +9,18 @@
     "hideIOSSafeAreaBottom": false,
     "actionBarHidden": true
   },
+  "pages": [
+    "index",
+    "game/shapes",
+    "game/letters",
+    "game/counting"
+  ],
   "listCSS": [],
   "listSyncJS": [],
   "listAsyncJS": [],
   "template": {
-    "name": "zaui-coffee",
-    "primaryColor": "#006af5",
+    "name": "be-vui-hoc",
+    "primaryColor": "#FF6B9D",
     "prefixCurrencySymbol": false,
     "currencySymbol": "đ",
     "headerLogo": ""
