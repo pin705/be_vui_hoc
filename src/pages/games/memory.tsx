@@ -31,10 +31,11 @@ const MemoryGame: React.FC = () => {
 
   const initializeGame = () => {
     // Create pairs of cards
-    const pairs = cardEmojis.map((emoji, index) => [
-      { id: index * 2, emoji, isFlipped: false, isMatched: false },
-      { id: index * 2 + 1, emoji, isFlipped: false, isMatched: false },
-    ]).flat();
+    const pairs: Card[] = [];
+    cardEmojis.forEach((emoji, index) => {
+      pairs.push({ id: index * 2, emoji, isFlipped: false, isMatched: false });
+      pairs.push({ id: index * 2 + 1, emoji, isFlipped: false, isMatched: false });
+    });
     
     // Shuffle cards
     const shuffled = pairs.sort(() => Math.random() - 0.5);

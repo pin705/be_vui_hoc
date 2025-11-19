@@ -22,13 +22,15 @@ Vui vẻ, thân thiện, khuyến khích, an toàn, và dễ thương
 
 ## 💡 Tính Năng Cốt Lõi
 
-### 3 Trò Chơi Mini Chính
+### 5 Trò Chơi Mini
 
 | Trò Chơi | Mục Tiêu | Cơ Chế | Route |
 |----------|----------|--------|-------|
 | **1. Nhận Biết Hình Dạng** | Phân biệt hình tròn, vuông, tam giác, ngôi sao | Tap để chọn và thả vào ô đúng | `/game/shapes` |
 | **2. Truy Tìm Chữ Cái** | Nhận diện chữ cái ABC | Tap vào chữ cái được hiển thị | `/game/letters` |
 | **3. Đếm & Tô Màu** | Đếm số từ 1-10 và nhận biết màu | Đếm vật thể, chọn số, tô màu | `/game/counting` |
+| **4. Ghép Hình** | Sắp xếp các mảnh ghép đúng vị trí | Tap để chọn và đổi chỗ | `/game/puzzle` |
+| **5. Trí Nhớ Siêu Phàm** | Tìm các cặp hình giống nhau | Lật thẻ và tìm cặp | `/game/memory` |
 
 ---
 
@@ -39,9 +41,9 @@ Màn hình chính (/)
     ↓
 Chọn Trò chơi
     ↓
-┌───────────────┬──────────────┬────────────────┐
-│ Hình Dạng     │ Chữ Cái     │ Đếm & Tô Màu   │
-└───────────────┴──────────────┴────────────────┘
+┌───────────────┬──────────────┬────────────────┬────────────┬────────────────┐
+│ Hình Dạng     │ Chữ Cái     │ Đếm & Tô Màu   │ Ghép Hình  │ Trí Nhớ        │
+└───────────────┴──────────────┴────────────────┴────────────┴────────────────┘
     ↓
 Màn hình Trò chơi
     ↓
@@ -78,17 +80,20 @@ src/
 │       ├── index.tsx          # Game home page (danh sách game)
 │       ├── shapes.tsx         # Nhận Biết Hình Dạng game
 │       ├── letters.tsx        # Truy Tìm Chữ Cái game
-│       └── counting.tsx       # Đếm & Tô Màu game
+│       ├── counting.tsx       # Đếm & Tô Màu game
+│       ├── puzzle.tsx         # Ghép Hình game
+│       └── memory.tsx         # Trí Nhớ Siêu Phàm game
 ├── state/
 │   └── game-state.ts          # Recoil atoms & selectors cho game
 ├── types/
 │   └── game.ts                # TypeScript interfaces
 ├── utils/
-│   └── config.ts              # Configuration utilities
+│   ├── config.ts              # Configuration utilities
+│   └── sound.ts               # Sound effects manager
 ├── css/
 │   ├── tailwind.css          # Tailwind input
 │   ├── styles.css            # Generated CSS
-│   └── app.scss              # Custom SCSS
+│   └── app.scss              # Custom SCSS with animations
 ├── static/                    # Static assets
 ├── app.ts                     # Entry point
 ├── state.ts                   # User state management
@@ -185,13 +190,23 @@ interface Game {
 
 ## 🎨 Thiết Kế UI/UX
 
-### Màu Sắc
-- **Primary Color:** `#FF6B9D` (Hồng pastel)
-- **Game 1 (Shapes):** `#FFB6C1` (Hồng nhạt)
-- **Game 2 (Letters):** `#87CEEB` (Xanh dương nhạt)
-- **Game 3 (Counting):** `#98FB98` (Xanh lá nhạt)
-- **Success:** `#4CAF50` (Xanh lá)
-- **Error:** `#F44336` (Đỏ)
+### Màu Sắc (Cải Tiến - Natural & Soft)
+- **Primary Color:** Gradient tím (#667eea to #764ba2)
+- **Game 1 (Shapes):** Gradient hồng (#fce4ec to #f48fb1)
+- **Game 2 (Letters):** Gradient xanh dương (#e3f2fd to #90caf9)
+- **Game 3 (Counting):** Gradient xanh lá (#e8f5e9 to #a5d6a7)
+- **Game 4 (Puzzle):** Gradient vàng (#fff9e6 to #ffecb3)
+- **Game 5 (Memory):** Gradient tím nhạt (#f3e5f5 to #ce93d8)
+- **Success:** Gradient xanh (#a5d6a7 to #66bb6a)
+- **Error:** Gradient đỏ (#ef9a9a to #e57373)
+
+### Cải Tiến UI (Không Còn Nhựa)
+✅ **Gradients mượt mà thay vì màu đơn sắc**  
+✅ **Box shadows nhiều lớp, mềm mại**  
+✅ **Border radius lớn hơn (rounded-2xl, rounded-3xl)**  
+✅ **Semi-transparent backgrounds (rgba)**  
+✅ **Smooth transitions và animations**  
+✅ **Glassmorphism effects**
 
 ### Đặc Điểm An Toàn
 ✅ **Không có quảng cáo**  
@@ -201,11 +216,12 @@ interface Game {
 ✅ **Màu sắc dịu nhẹ, không gây mỏi mắt**
 
 ### Phản Hồi Tích Cực
-- 🎉 Emoji lớn khi hoàn thành
-- ✅ Màu xanh cho đáp án đúng
-- ❌ Màu đỏ cho đáp án sai (chớp nhanh)
-- ⭐ Hệ thống sao (1-3 sao)
+- 🎉 Emoji lớn khi hoàn thành với animation bounce
+- ✅ Gradient xanh cho đáp án đúng với glow effect
+- ❌ Gradient đỏ cho đáp án sai (chớp nhanh)
+- ⭐ Hệ thống sao (1-3 sao) với gradient vàng
 - 🏆 Động viên bằng text: "Tuyệt vời!", "Xuất sắc!"
+- 🔊 Âm thanh phản hồi tức thì
 
 ---
 
@@ -230,6 +246,20 @@ interface Game {
 - 🌽 Bắp
 - 🍒 Cherry
 
+### Vật Thể Ghép Hình (Emojis)
+- 🐶 Chó
+- 🌈 Cầu vồng
+- 🚗 Xe hơi
+- 🌸 Hoa
+
+### Trí Nhớ (Animal Emojis)
+- 🐱 Mèo
+- 🐶 Chó
+- 🐼 Gấu trúc
+- 🦁 Sư tử
+- 🐸 Ếch
+- 🦊 Cáo
+
 ### Màu Sắc
 - Đỏ (#FF0000)
 - Xanh lá (#00FF00)
@@ -238,11 +268,12 @@ interface Game {
 - Cam (#FFA500)
 - Tím (#800080)
 
-### Âm Thanh (Tương lai)
-- ✅ Âm thanh đúng
-- ❌ Âm thanh sai
-- 🎉 Âm thanh hoàn thành
-- 🎵 Nhạc nền nhẹ nhàng
+### Âm Thanh (✅ Đã Thực Hiện)
+- ✅ Âm thanh đúng (ascending tones)
+- ✅ Âm thanh sai (descending tone)
+- ✅ Âm thanh hoàn thành (celebration melody)
+- ✅ Âm thanh tap/click (short beep)
+- 🎵 Sử dụng Web Audio API để tạo âm thanh
 
 ---
 
@@ -306,6 +337,30 @@ npm run deploy
 - 3 sao: 4/4 đúng
 - 2 sao: 3/4 đúng
 - 1 sao: <3 đúng
+
+### Game Letters
+- Maxscore: 8
+- 3 sao: >=7/8 đúng
+- 2 sao: >=5/8 đúng
+- 1 sao: <5 đúng
+
+### Game Counting
+- Maxscore: 8 levels
+- 3 sao: >=7/8 levels
+- 2 sao: >=5/8 levels
+- 1 sao: <5 levels
+
+### Game Puzzle
+- Maxscore: 4 puzzles
+- 3 sao: 4/4 hoàn thành
+- 2 sao: 3/4 hoàn thành
+- 1 sao: <3 hoàn thành
+
+### Game Memory
+- Maxscore: 20 points (fewer moves = better)
+- 3 sao: <=8 moves
+- 2 sao: <=12 moves
+- 1 sao: >12 moves
 
 ### Game Letters
 - Maxscore: 8
