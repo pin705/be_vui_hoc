@@ -3,6 +3,7 @@ import { Box, Page, Text, Button } from "zmp-ui";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { colorsDataState, gameScoresState } from "state/game-state";
+import { soundManager } from "utils/sound";
 
 interface CountingLevel {
   count: number;
@@ -45,11 +46,13 @@ const CountingGame: React.FC = () => {
     setSelectedNumber(number);
     
     if (number === currentLevelData.count) {
+      soundManager.playSuccess();
       setScore((prev) => prev + 1);
       setTimeout(() => {
         setStep('color');
       }, 1000);
     } else {
+      soundManager.playError();
       setTimeout(() => {
         setSelectedNumber(null);
       }, 1000);
@@ -57,11 +60,13 @@ const CountingGame: React.FC = () => {
   };
 
   const handleColorSelect = (color: string) => {
+    soundManager.playTap();
     setSelectedColor(color);
   };
 
   const handleItemClick = (index: number) => {
     if (selectedColor && !coloredItems[index]) {
+      soundManager.playTap();
       const newColoredItems = [...coloredItems];
       newColoredItems[index] = true;
       setColoredItems(newColoredItems);
@@ -74,6 +79,7 @@ const CountingGame: React.FC = () => {
             setSelectedNumber(null);
             setSelectedColor(null);
           } else {
+            soundManager.playCelebration();
             setGameComplete(true);
             const stars = score + 1 >= 7 ? 3 : score + 1 >= 5 ? 2 : 1;
             setGameScores((prev) => [
@@ -102,27 +108,44 @@ const CountingGame: React.FC = () => {
   };
 
   return (
-    <Page className="bg-gradient-to-b from-green-100 to-green-50">
+    <Page 
+      className="relative overflow-hidden"
+      style={{
+        background: "linear-gradient(to bottom, #e8f5e9, #c8e6c9, #a5d6a7)",
+      }}
+    >
       <Box className="p-4">
         {/* Header */}
         <Box className="flex justify-between items-center mb-6">
           <Button
             size="small"
             onClick={() => navigate("/")}
-            className="bg-white"
+            className="shadow-lg"
+            style={{
+              background: "rgba(255, 255, 255, 0.9)",
+              borderRadius: "12px",
+            }}
           >
             ← Quay lại
           </Button>
-          <Text className="text-xl font-bold text-green-600">
-            Điểm: {score}/{levels.length}
-          </Text>
+          <Box 
+            className="px-4 py-2 rounded-full"
+            style={{
+              background: "rgba(255, 255, 255, 0.9)",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <Text className="text-xl font-bold text-green-600">
+              Điểm: {score}/{levels.length}
+            </Text>
+          </Box>
         </Box>
 
         <Box className="text-center mb-8">
-          <Text className="text-2xl font-bold text-gray-800">
+          <Text className="text-3xl font-bold text-green-900 mb-2">
             🎨 Đếm & Tô Màu 🎨
           </Text>
-          <Text className="text-gray-600 mt-2">
+          <Text className="text-gray-700 font-medium">
             {step === 'count' ? 'Đếm số vật thể!' : 'Tô màu cho vật thể!'}
           </Text>
         </Box>
@@ -227,8 +250,14 @@ const CountingGame: React.FC = () => {
             )}
           </>
         ) : (
-          <Box className="text-center mt-12">
-            <Text className="text-6xl mb-4">🌟</Text>
+          <Box 
+            className="text-center mt-12 rounded-3xl p-8 max-w-md mx-auto"
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              boxShadow: "0 12px 40px rgba(0, 0, 0, 0.15)",
+            }}
+          >
+            <Text className="text-6xl mb-4 animate-bounce">🌟</Text>
             <Text className="text-3xl font-bold text-green-600 mb-4">
               Tuyệt vời quá!
             </Text>
@@ -236,10 +265,24 @@ const CountingGame: React.FC = () => {
               Bạn đã hoàn thành tất cả các màn chơi!
             </Text>
             <Box className="flex gap-4 justify-center">
-              <Button onClick={resetGame} className="bg-green-500">
+              <Button 
+                onClick={resetGame}
+                style={{
+                  background: "linear-gradient(135deg, #81c784 0%, #66bb6a 100%)",
+                  color: "white",
+                  boxShadow: "0 4px 12px rgba(129, 199, 132, 0.4)",
+                }}
+              >
                 Chơi lại
               </Button>
-              <Button onClick={() => navigate("/")} className="bg-purple-500">
+              <Button 
+                onClick={() => navigate("/")}
+                style={{
+                  background: "linear-gradient(135deg, #9575cd 0%, #7e57c2 100%)",
+                  color: "white",
+                  boxShadow: "0 4px 12px rgba(149, 117, 205, 0.4)",
+                }}
+              >
                 Về trang chủ
               </Button>
             </Box>
