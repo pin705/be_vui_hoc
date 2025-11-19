@@ -1,8 +1,8 @@
 {
-  "name": "zaui-coffee",
+  "name": "be-vui-hoc",
   "private": true,
-  "version": "1.1.0",
-  "description": "ZaUI Coffee",
+  "version": "1.0.0",
+  "description": "Bé Vui Học - Educational Game for Kids",
   "repository": "",
   "license": "UNLICENSED",
   "browserslist": [
